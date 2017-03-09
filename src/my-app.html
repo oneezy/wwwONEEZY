@@ -1,0 +1,431 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-header-fullscreen/app-header-fullscreen.html">
+<link rel="import" href="../bower_components/app-header-fullscreen/effects/parallax-back.html">
+<link rel="import" href="../bower_components/app-header-fullscreen/effects/blend-back.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-scroll-spy/iron-auto-scroll-spy.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+<link rel="import" href="../bower_components/super-icons/super-icons.html">
+
+
+
+<!-- Temporary -->
+<link rel="import" href="../bower_components/app-header-fullscreen/demo/demo-helpers/sample-content.html">
+<link rel="import" href="../bower_components/app-header-fullscreen/demo/demo-helpers/cat-grid-list.html">
+<link rel="import" href="../bower_components/app-header-fullscreen/demo/demo-helpers/demo-icons.html">
+<!--
+<link rel="import" href="../app-header-fullscreen.html">
+<link rel="import" href="../effects/parallax-back.html">
+<link rel="import" href="../effects/blend-back.html">
+<link rel="import" href="demo-helpers/sample-content.html">
+<link rel="import" href="demo-helpers/cat-grid-list.html">
+<link rel="import" href="demo-helpers/demo-icons.html"> -->
+
+
+
+<dom-module id="my-app">
+  <template>
+    <style is="custom-style" include="app-grid-style">
+      :host {
+
+        /* Theme */
+        --primary-color:              #191919;
+        --secondary-color:            rgba(256,256,256, .5);
+        --accent-color:               #1bfec0;
+        
+        /* Dark */
+        --dark-primary:               rgba(0,0,0, .87);
+        --dark-secondary:             rgba(0,0,0, .54);
+        --dark-disabled:              rgba(0,0,0, .38);
+        --dark-divider:               rgba(0,0,0, .12);
+        
+        /* Lite */
+        --lite-primary:               rgba(256,256,256, 1);
+        --lite-secondary:             rgba(256,256,256, .7);
+        --lite-disabled:              rgba(256,256,256, .5);
+        --lite-divider:               rgba(256,256,256, .12);
+
+        display: block;
+      }
+
+      /* Iron Scroll Spy FAB */
+      footer                                     { position: fixed; bottom: 5%; right: 5%; z-index: 2; }
+      footer paper-tabs                          { overflow: visible; height: 100%; }
+      footer paper-tabs paper-tab                { display: none; overflow: visible; height: 100%; }
+      footer paper-tabs paper-tab.focused        { display: block;  }
+
+      paper-tabs {
+        --paper-tabs-selection-bar-color: var(--lite-primary);
+        --paper-tabs: {
+          overflow: visible;
+        };
+
+        --paper-tabs-content: {
+          overflow: visible;
+        }; 
+
+        --paper-tabs-container: {
+          overflow: visible;
+        }; 
+      }
+
+      paper-tab {
+        --paper-tab-ink: var(--lite-primary);
+        --paper-tab: {
+          overflow: visible;
+        }; 
+
+        
+      }
+
+      /*
+      app-header {
+        color: #fff;
+        background-color: var(--primary-color);
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--secondary-color);
+        line-height: 40px;
+      }
+
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }*/
+
+      body {
+        margin: 0;
+        @apply(--paper-font-common-base);
+      }
+
+      .flex {
+        @apply(--layout-flex);
+      }
+
+      app-drawer {
+        z-index: 4;
+      --app-drawer-scrim-background: var(--dark-secondary);
+      --app-drawer-content-container: { background-color: var(--lite-primary);
+      };
+    }
+
+      app-header-fullscreen {
+        color: var(--secondary-color);
+        z-index: 3;
+        position: relative;
+        --app-header-fullscreen-background: var(--primary-color);
+        --app-header-fullscreen-front-layer: {
+          @apply(--layout-vertical);
+        };
+      }
+
+      app-header-fullscreen[fullscreen] #bottomToolbar {
+        opacity: 0;
+      }
+
+      #bottomToolbar {
+        height: 200px;
+        z-index: 1;
+        transition: opacity 0.4s;
+      }
+
+      app-header-fullscreen[fullscreen] paper-icon-button {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      paper-icon-button{
+        color: white;
+        transition: background-color 0.4s;
+        border-radius: 50%;
+        background-color: transparent;
+      }
+
+      #stickyToolbar {
+        z-index: 1;
+      }
+
+      #headerImg {
+        width: 100%;
+        height: auto;
+        margin-bottom: -4px;
+      }
+
+      [condensed-title] {
+        margin-left: 12px;
+      }
+
+      #backLayer {
+        background-color: white;
+      }
+
+      @media all and (min-width: 600px) {
+        #bottomToolbar {
+          font-size: 34px;
+        }
+      }
+        
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+
+
+
+
+
+    <!--<app-drawer-layout fullbleed>
+      <app-drawer id="drawer">
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+          <a name="view1" href="/view1">View One</a>
+          <a name="view2" href="/view2">View Two</a>
+          <a name="view3" href="/view3">View Three</a>
+        </iron-selector>
+      </app-drawer>
+
+      <app-header-layout has-scrolling-region>
+
+        <app-header condenses reveals effects="waterfall">
+          <app-toolbar>
+            <paper-icon-button icon="super-icons:menu" drawer-toggle></paper-icon-button>
+            <div main-title>My App</div>
+          </app-toolbar>
+        </app-header>
+
+        <iron-pages
+            selected="[[page]]"
+            attr-for-selected="name"
+            fallback-selection="view404"
+            role="main">
+          <my-view1 name="view1"></my-view1>
+          <my-view2 name="view2"></my-view2>
+          <my-view3 name="view3"></my-view3>
+          <my-view404 name="view404"></my-view404>
+        </iron-pages>
+      </app-header-layout>
+    </app-drawer-layout>-->
+
+
+
+
+
+
+
+
+      <!-- SCROLL SPY -->
+      <iron-auto-scroll-spy id="scrollSpy" selected="{{selected}}" scroll-target="document">
+
+        <!-- APP HERO FULLSCREEN -->
+        <app-header-fullscreen
+          id="header"
+          condenses
+          waterfall-shadow
+          fullscreen="{{fullscreen}}"
+          initial-content-scroll="200"
+          effects="parallax-back resize-title blend-back">
+
+          <!-- MAIN NAVIGATION -->
+          <app-toolbar id="stickyToolbar" id="frontFade">
+            <paper-icon-button 
+              icon="super-icons:menu"
+              on-tap="_toggleDrawer">
+            </paper-icon-button>
+
+            <span condensed-title>Oneezy</span>
+
+            <paper-tabs spacer selected="{{selected}}">
+              <paper-tab>WHO.</paper-tab>
+              <paper-tab>WHAT.</paper-tab>
+              <paper-tab>WHEN.</paper-tab>
+              <paper-tab>WHERE.</paper-tab>
+              <paper-tab>WHY.</paper-tab>
+            </paper-tabs>
+
+            <paper-icon-button
+              icon="{{_getToggleFullscreenIcon(fullscreen)}}"
+              on-tap="_toggleFullscreen">
+            </paper-icon-button>
+          </app-toolbar>
+
+
+          <!-- PUSHES DOWN -->
+          <div class="flex"></div>
+
+
+
+          <!-- HERO SCROLL FX -->
+          <app-toolbar id="bottomToolbar">
+            <span main-title spacer>Oneezy</span>
+          </app-toolbar>
+
+          <!-- HERO CONTENT -->
+          <div id="backLayer" slot="back-layer">
+            <img id="headerImg" src="http://placekitten.com/1280/800">
+            <cat-grid-list></cat-grid-list>
+          </div>
+
+        </app-header-fullscreen>
+
+        <!-- AUTO SCROLL SPY POINTS -->
+        <div style="height: 100vh; padding: 100px 0 0; background: #ccc;">sample 1</div>
+        <div style="height: 100vh; padding: 100px 0 0; background: #fff;">sample 2</div>
+        <div style="height: 100vh; padding: 100px 0 0; background: #ccc;">sample 3</div>
+        <div style="height: 100vh; padding: 100px 0 0; background: #fff;">sample 4</div>
+
+      </iron-auto-scroll-spy>
+
+      <!-- AUTO SCROLL SPY FAB -->
+      <footer>
+        <paper-tabs id="footerTabs" selected="{{selected}}" align-bottom="true" no-bar noink>
+          <paper-tab tab="hidden">
+            <paper-fab icon="super-icons:arrow-up"></paper-fab>
+          </paper-tab>
+
+          <paper-tab tab="active">
+            <paper-fab icon="super-icons:arrow-down"></paper-fab>
+          </paper-tab>
+
+          <paper-tab tab="hidden">
+            <paper-fab icon="super-icons:arrow-down"></paper-fab>
+          </paper-tab>
+
+          <paper-tab tab="hidden">
+            <paper-fab icon="super-icons:arrow-down"></paper-fab>
+          </paper-tab>
+
+          <paper-tab tab="hidden">
+            <paper-fab icon="super-icons:arrow-down"></paper-fab>
+          </paper-tab>
+        </paper-tabs>
+      </footer>
+
+
+
+      <!-- APP DRAWER -->
+      <!--<app-drawer id="drawer">
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+          <a name="view1" href="/view1">View One</a>
+          <a name="view2" href="/view2">View Two</a>
+          <a name="view3" href="/view3">View Three</a>
+        </iron-selector>
+      </app-drawer>-->
+
+      <app-drawer id="drawer" swipe-open>
+        <iron-selector role="navigation" class="drawer-list" selected="[[categoryName]]" attr-for-selected="name">
+          <template is="dom-repeat" items="[[categories]]" as="category" initial-count="4">
+            <a name="[[category.name]]" href="/list/[[category.name]]">[[category.headline]]</a>
+          </template>
+        </iron-selector>
+      </app-drawer>
+
+
+  </template>
+
+
+
+
+
+
+
+
+  <script>
+    Polymer({
+      is: 'my-app',
+
+      properties: {
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged'
+        }
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)',
+        '_onSelectedChanged(selected)'
+      ],
+
+      _onSelectedChanged: function(selectedIndex) {
+        var tabs = this.$.footerTabs.querySelectorAll('paper-tab');
+        var newIndex = (selectedIndex + 1) % tabs.length;
+        var newEl = tabs[newIndex];
+        this.classFollows('focused', newEl, this._oldEl);
+        this._oldEl = newEl;
+      },
+
+      _routePageChanged: function(page) {
+        this.page = page || 'view1';
+
+        if (!this.$.drawer.persistent) {
+          this.$.drawer.close();
+        }
+      },
+
+      _pageChanged: function(page) {
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+      },
+
+      _showPage404: function() {
+        this.page = 'view404';
+      },
+
+      _toggleDrawer: function() {
+        this.$.drawer.toggle();
+      },
+
+      _toggleFullscreen: function() {
+        this.$.header.scrollToggleFullscreen();
+      },
+
+      _getToggleFullscreenIcon: function(fullscreen) {
+        return fullscreen ? 'super-icons:close' : 'super-icons:home';
+      },
+
+      ready: function() {
+        this.$.scrollSpy.scrollTarget;
+      }
+
+    });
+  </script>
+</dom-module>
